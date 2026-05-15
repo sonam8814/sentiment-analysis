@@ -1,0 +1,10 @@
+.env.example
+__pycache__/
+data/cache/
+.venv
+.pytest_cache/
+*.pyc
+*.pyo
+logs/
+.ruff_cache/
+PRD.md

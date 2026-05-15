@@ -1,0 +1,92 @@
+[
+  {
+    "id": "a1b2c3d4-0001-4000-8000-000000000001",
+    "created_at": "2026-04-01T10:00:00Z",
+    "response_date": "2026-04-01",
+    "nps_score": 10,
+    "comment": "Absolutely love the product! Best tool I've used.",
+    "customer_id": "cust_001",
+    "segment": "enterprise"
+  },
+  {
+    "id": "a1b2c3d4-0002-4000-8000-000000000002",
+    "created_at": "2026-04-02T11:30:00Z",
+    "response_date": "2026-04-02",
+    "nps_score": 9,
+    "comment": "Great product but the pricing is too high for what you get.",
+    "customer_id": "cust_002",
+    "segment": "smb"
+  },
+  {
+    "id": "a1b2c3d4-0003-4000-8000-000000000003",
+    "created_at": "2026-04-03T09:15:00Z",
+    "response_date": "2026-04-03",
+    "nps_score": 7,
+    "comment": "It's okay. Nothing special.",
+    "customer_id": "cust_003",
+    "segment": "free"
+  },
+  {
+    "id": "a1b2c3d4-0004-4000-8000-000000000004",
+    "created_at": "2026-04-04T14:00:00Z",
+    "response_date": "2026-04-04",
+    "nps_score": 3,
+    "comment": "Terrible experience. The app crashed multiple times and support was unresponsive. Contact me at angry@user.com.",
+    "customer_id": "cust_004",
+    "segment": "enterprise"
+  },
+  {
+    "id": "a1b2c3d4-0005-4000-8000-000000000005",
+    "created_at": "2026-04-05T16:45:00Z",
+    "response_date": "2026-04-05",
+    "nps_score": 8,
+    "comment": null,
+    "customer_id": "cust_005",
+    "segment": "smb"
+  },
+  {
+    "id": "a1b2c3d4-0006-4000-8000-000000000006",
+    "created_at": "2026-04-06T08:20:00Z",
+    "response_date": "2026-04-06",
+    "nps_score": 1,
+    "comment": "Worst product ever. Call me at 555-000-1234 to discuss.",
+    "customer_id": "cust_006",
+    "segment": "free"
+  },
+  {
+    "id": "a1b2c3d4-0007-4000-8000-000000000007",
+    "created_at": "2026-04-07T12:00:00Z",
+    "response_date": "2026-04-07",
+    "nps_score": 10,
+    "comment": "Love it!",
+    "customer_id": "cust_007",
+    "segment": "enterprise"
+  },
+  {
+    "id": "a1b2c3d4-0008-4000-8000-000000000008",
+    "created_at": "2026-04-08T13:30:00Z",
+    "response_date": "2026-04-08",
+    "nps_score": 6,
+    "comment": "The onboarding was confusing. Took me 2 hours to set up.",
+    "customer_id": "cust_008",
+    "segment": "smb"
+  },
+  {
+    "id": "a1b2c3d4-0009-4000-8000-000000000009",
+    "created_at": "2026-04-09T15:00:00Z",
+    "response_date": "2026-04-09",
+    "nps_score": 5,
+    "comment": "UI is ugly and hard to navigate. Visit https://competitor.com for a better option.",
+    "customer_id": "cust_009",
+    "segment": "free"
+  },
+  {
+    "id": "a1b2c3d4-0010-4000-8000-000000000010",
+    "created_at": "2026-04-10T10:10:00Z",
+    "response_date": "2026-04-10",
+    "nps_score": 9,
+    "comment": "I like the features but performance is terrible. Pages take 10 seconds to load.",
+    "customer_id": "cust_010",
+    "segment": "enterprise"
+  }
+]
