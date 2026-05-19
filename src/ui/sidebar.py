@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import streamlit as st
 
 from config.settings import get_settings
+from src.data.supabase_client import fetch_distinct_segments
 
 
 def render_sidebar() -> dict:
@@ -33,9 +34,9 @@ def render_sidebar() -> dict:
 
         st.markdown("---")
 
-        # Segment filter
+        # Segment filter — dynamically loaded from DB
         st.markdown("### Segments")
-        segment_options = ["enterprise", "smb", "free"]
+        segment_options = fetch_distinct_segments()
         segments = st.multiselect(
             "Filter by segment",
             options=segment_options,

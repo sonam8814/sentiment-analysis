@@ -8,3 +8,4 @@ data/cache/
 logs/
 .ruff_cache/
 PRD.md
+.env

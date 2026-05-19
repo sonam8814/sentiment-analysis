@@ -111,3 +111,21 @@ def fetch_responses(
     except Exception as exc:
         logger.error(f"Supabase query failed: {exc}")
         raise SupabaseConnectionError(f"Failed to fetch responses: {exc}") from exc
+
+
+@st.cache_data(ttl=600)
+def fetch_distinct_segments() -> list[str]:
+    """Fetch unique segment values from the nps_responses table.
+
+    Returns:
+        Sorted list of distinct segment strings.
+    """
+    client = get_supabase_client()
+    settings = get_settings()
+    try:
+        response = client.table(settings.supabase_table_name).select("segment").execute()
+        segments = sorted({row["segment"] for row in response.data if row.get("segment")})
+        return segments
+    except Exception as exc:
+        logger.warning(f"Could not fetch segments, using empty list: {exc}")
+        return []

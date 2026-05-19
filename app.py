@@ -34,7 +34,7 @@ setup_logging(settings.log_level)
 inject_css()
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=600, show_spinner=False)
 def load_and_process_data(
     start_date: str,
     end_date: str,
@@ -69,7 +69,13 @@ def load_and_process_data(
     df = clean_dataframe(df)
 
     # Run ABSA (LLM layer has its own disk cache)
-    df = analyze_dataframe(df)
+    try:
+        df = analyze_dataframe(df)
+    except Exception as exc:
+        logger.error(f"ABSA analysis failed, continuing without it: {exc}")
+        df["aspects"] = [[] for _ in range(len(df))]
+        df["overall_sentiment"] = "neutral"
+        df["analyzed_at"] = pd.Timestamp.now(tz="UTC")
 
     # Flag mismatches
     df = flag_toxic_promoters(df)
@@ -84,13 +90,14 @@ def main() -> None:
     filters = render_sidebar()
 
     # Load data
-    df = load_and_process_data(
-        start_date=filters["start_date"].isoformat(),
-        end_date=filters["end_date"].isoformat(),
-    )
+    with st.spinner("Loading and analyzing data..."):
+        df = load_and_process_data(
+            start_date=filters["start_date"].isoformat(),
+            end_date=filters["end_date"].isoformat(),
+        )
 
     # Apply segment filter (post-cache, since it's a lightweight filter)
-    if not df.empty and "segment" in df.columns and filters["segments"]:
+    if not df.empty and "segment" in df.columns:
         df = df[df["segment"].isin(filters["segments"])]
 
     # Route to selected page

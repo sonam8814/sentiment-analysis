@@ -24,10 +24,10 @@ def inject_css() -> None:
             font-family: 'Inter', sans-serif;
         }}
 
-        /* Hide Streamlit header and footer */
+        /* Hide Streamlit default menu and footer, but keep header for sidebar toggle */
         #MainMenu {{visibility: hidden;}}
-        header {{visibility: hidden;}}
         footer {{visibility: hidden;}}
+        header {{background: transparent !important; border-bottom: none !important;}}
 
         /* Glassmorphism card */
         .glass-card {{
