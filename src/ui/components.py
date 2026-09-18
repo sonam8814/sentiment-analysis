@@ -138,16 +138,18 @@ def section_header(title: str, subtitle: str | None = None) -> None:
     )
 
 
-def aspect_badge(aspect: str, sentiment: str) -> str:
-    """Return HTML for a colored aspect pill badge.
+def aspect_badge(aspect: str, sentiment: str, tooltip: str | None = None) -> str:
+    """Return HTML for a colored aspect pill badge with optional hover tooltip.
 
     Args:
         aspect: Aspect name (e.g. "pricing").
         sentiment: One of "positive", "neutral", "negative".
+        tooltip: Optional text shown on hover.
 
     Returns:
         HTML string for the badge.
     """
     badge_class = f"badge-{sentiment}"
     display_name = aspect.replace("_", " ").title()
-    return f'<span class="aspect-badge {badge_class}">{display_name}</span>'
+    title_attr = f' title="{tooltip}"' if tooltip else ""
+    return f'<span class="aspect-badge {badge_class}"{title_attr}>{display_name}</span>'

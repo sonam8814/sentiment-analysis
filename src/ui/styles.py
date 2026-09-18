@@ -120,6 +120,12 @@ def inject_css() -> None:
             color: {COLORS["passive"]};
         }}
 
+        /* Aspect badge tooltip */
+        .aspect-badge[title] {{
+            cursor: default;
+            position: relative;
+        }}
+
         /* Header bar */
         .header-bar {{
             display: flex;

@@ -142,13 +142,16 @@ def render_aspects(df: pd.DataFrame) -> None:
                 )
 
     if filtered_rows:
-        # Show badges
-        sentiments = [r["Sentiment"] for r in filtered_rows]
+        # Show badges with average confidence on hover
+        raw_sentiments = [sent for r in filtered_rows for sent in [r["Sentiment"].split(" ", 1)[-1]]]
+        raw_confidences = [float(r["Confidence"]) for r in filtered_rows]
         badges_html = ""
         for s in ["positive", "neutral", "negative"]:
-            count = sentiments.count(s)
-            if count > 0:
-                badges_html += aspect_badge(f"{s} ({count})", s)
+            indices = [i for i, v in enumerate(raw_sentiments) if v == s]
+            if indices:
+                avg_conf = sum(raw_confidences[i] for i in indices) / len(indices)
+                tooltip = f"Avg confidence: {avg_conf:.0%}"
+                badges_html += aspect_badge(f"{s} ({len(indices)})", s, tooltip=tooltip)
         st.markdown(badges_html, unsafe_allow_html=True)
 
         st.dataframe(
