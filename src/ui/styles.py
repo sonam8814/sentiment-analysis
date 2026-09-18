@@ -55,12 +55,25 @@ def inject_css() -> None:
             font-size: 2rem;
             font-weight: 700;
             line-height: 1.2;
+            animation: cardFadeSlide 0.4s ease-out both;
         }}
 
         .glass-card .delta {{
             font-size: 0.85rem;
             font-weight: 500;
             margin-top: 0.25rem;
+            animation: cardFadeSlide 0.6s ease-out both;
+        }}
+
+        @keyframes cardFadeSlide {{
+            from {{
+                opacity: 0;
+                transform: translateY(6px);
+            }}
+            to {{
+                opacity: 1;
+                transform: translateY(0);
+            }}
         }}
 
         .delta-positive {{
