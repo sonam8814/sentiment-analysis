@@ -17,6 +17,7 @@ from src.ai.absa_engine import analyze_dataframe  # noqa: E402
 from src.analytics.mismatch_detector import flag_toxic_promoters  # noqa: E402
 from src.data.cleaner import clean_dataframe  # noqa: E402
 from src.data.supabase_client import fetch_responses  # noqa: E402
+from src.ui.components import header_bar  # noqa: E402
 from src.ui.pages.aspects import render_aspects  # noqa: E402
 from src.ui.pages.overview import render_overview  # noqa: E402
 from src.ui.pages.raw_explorer import render_raw_explorer  # noqa: E402
@@ -100,16 +101,21 @@ def main() -> None:
     if not df.empty and "segment" in df.columns:
         df = df[df["segment"].isin(filters["segments"])]
 
-    # Route to selected page
-    page = filters["page"]
+    # Header bar
+    header_bar()
 
-    if page == "Overview":
+    # Tab navigation
+    tab_overview, tab_aspects, tab_toxic, tab_raw = st.tabs(
+        ["Overview", "Aspects", "Toxic Promoters", "Raw Data"]
+    )
+
+    with tab_overview:
         render_overview(df)
-    elif page == "Aspects":
+    with tab_aspects:
         render_aspects(df)
-    elif page == "Toxic Promoters":
+    with tab_toxic:
         render_toxic_promoters(df)
-    elif page == "Raw Data":
+    with tab_raw:
         render_raw_explorer(df)
 
 

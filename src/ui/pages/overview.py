@@ -7,8 +7,8 @@ import streamlit as st
 
 from config.theme import COLORS
 from src.analytics.aggregator import aspect_sentiment_distribution, nps_trend
-from src.analytics.nps_calculator import calculate_nps, category_breakdown
-from src.ui.components import kpi_card, section_header
+from src.analytics.nps_calculator import calculate_nps, categorize, category_breakdown
+from src.ui.components import empty_state, kpi_card, section_header
 
 
 def _compute_delta(current: float, previous: float) -> str:
@@ -45,6 +45,36 @@ def _split_periods(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     return current, previous
 
 
+def _weekly_sparklines(df: pd.DataFrame) -> dict[str, list[float]]:
+    if df.empty or "response_date" not in df.columns:
+        return {}
+
+    tmp = df.copy()
+    tmp["_week"] = pd.to_datetime(tmp["response_date"]).dt.to_period("W")
+    tmp["_cat"] = tmp["nps_score"].apply(categorize)
+
+    weekly = (
+        tmp.groupby("_week")
+        .agg(
+            count=("nps_score", "size"),
+            promoters=("_cat", lambda x: (x == "promoter").sum()),
+            detractors=("_cat", lambda x: (x == "detractor").sum()),
+        )
+        .sort_index()
+    )
+
+    weekly["nps"] = ((weekly["promoters"] - weekly["detractors"]) / weekly["count"]) * 100
+    weekly["prom_pct"] = (weekly["promoters"] / weekly["count"]) * 100
+    weekly["det_pct"] = (weekly["detractors"] / weekly["count"]) * 100
+
+    return {
+        "counts": weekly["count"].tolist(),
+        "nps": weekly["nps"].tolist(),
+        "promoter_pct": weekly["prom_pct"].tolist(),
+        "detractor_pct": weekly["det_pct"].tolist(),
+    }
+
+
 def render_overview(df: pd.DataFrame) -> None:
     """Render the Overview page.
 
@@ -53,8 +83,17 @@ def render_overview(df: pd.DataFrame) -> None:
     """
     section_header("Overview", "Key NPS metrics at a glance")
 
+    if df.empty:
+        empty_state(
+            "📭",
+            "No responses found",
+            "Try expanding your date range or adjusting segment filters.",
+        )
+        return
+
     # Split for delta calculations
     current, previous = _split_periods(df)
+    sparks = _weekly_sparklines(df)
 
     nps_current = calculate_nps(current) if not current.empty else 0.0
     nps_previous = calculate_nps(previous) if not previous.empty else 0.0
@@ -64,13 +103,14 @@ def render_overview(df: pd.DataFrame) -> None:
     total_current = len(current)
     total_previous = len(previous)
 
-    # Top row: 4 KPI cards
+    # Top row: 4 KPI cards with sparklines
     cols = st.columns(4)
     with cols[0]:
         kpi_card(
             "Total Responses",
             f"{len(df):,}",
             delta=_compute_delta(total_current, total_previous),
+            sparkline=sparks.get("counts"),
         )
     with cols[1]:
         nps_val = calculate_nps(df)
@@ -80,6 +120,7 @@ def render_overview(df: pd.DataFrame) -> None:
             f"{nps_val:+.0f}",
             delta=_compute_delta(nps_current, nps_previous),
             color=nps_color,
+            sparkline=sparks.get("nps"),
         )
     with cols[2]:
         bd = category_breakdown(df)
@@ -93,6 +134,7 @@ def render_overview(df: pd.DataFrame) -> None:
             f"{pct_promoters:.1f}%",
             delta=f"{delta_prom}pp",
             color=COLORS["promoter"],
+            sparkline=sparks.get("promoter_pct"),
         )
     with cols[3]:
         pct_detractors = bd["detractor"] * 100
@@ -105,6 +147,7 @@ def render_overview(df: pd.DataFrame) -> None:
             f"{pct_detractors:.1f}%",
             delta=f"{delta_det}pp",
             color=COLORS["detractor"],
+            sparkline=sparks.get("detractor_pct"),
         )
 
     # Middle row: NPS trend + category donut
@@ -134,7 +177,7 @@ def render_overview(df: pd.DataFrame) -> None:
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No trend data available for the selected range.")
+            empty_state("📈", "No trend data yet", "Need at least two weeks of data to show a trend.")
 
     with col_donut:
         if not df.empty:
@@ -167,7 +210,7 @@ def render_overview(df: pd.DataFrame) -> None:
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No data available.")
+            empty_state("🍩", "No category data available")
 
     # Bottom row: Top 5 aspects by volume
     section_header("Top Aspects", "Most mentioned aspects with sentiment breakdown")
@@ -209,6 +252,6 @@ def render_overview(df: pd.DataFrame) -> None:
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No aspect data available.")
+            empty_state("🔍", "No aspect data available", "Aspects are extracted from comment text by the LLM.")
     else:
         st.info("No aspect data available.")

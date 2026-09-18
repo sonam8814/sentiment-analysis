@@ -3,7 +3,8 @@
 import pandas as pd
 import streamlit as st
 
-from src.ui.components import section_header
+from config.theme import COLORS
+from src.ui.components import empty_state, kpi_card, section_header
 
 
 def _build_triage_df(df: pd.DataFrame, flag_col: str) -> pd.DataFrame:
@@ -62,8 +63,32 @@ def render_toxic_promoters(df: pd.DataFrame) -> None:
     )
 
     if df.empty:
-        st.info("No data available for the selected filters.")
+        empty_state(
+            "📭",
+            "No data available",
+            "Try expanding your date range or adjusting segment filters.",
+        )
         return
+
+    # Summary KPI row
+    toxic_count = int(df.get("is_toxic_promoter", pd.Series(dtype=bool)).sum())
+    glowing_count = int(df.get("is_glowing_detractor", pd.Series(dtype=bool)).sum())
+    total_promoters = int((df.get("category", pd.Series()) == "promoter").sum()) or 1
+    total_detractors = int((df.get("category", pd.Series()) == "detractor").sum()) or 1
+    toxic_pct = (toxic_count / total_promoters) * 100
+    glowing_pct = (glowing_count / total_detractors) * 100
+
+    cols = st.columns(4)
+    with cols[0]:
+        kpi_card("Toxic Promoters", str(toxic_count), color=COLORS["toxic"])
+    with cols[1]:
+        kpi_card("% of Promoters", f"{toxic_pct:.1f}%", color=COLORS["toxic"])
+    with cols[2]:
+        kpi_card("Glowing Detractors", str(glowing_count), color=COLORS["promoter"])
+    with cols[3]:
+        kpi_card("% of Detractors", f"{glowing_pct:.1f}%", color=COLORS["promoter"])
+
+    st.markdown("")
 
     # Toxic Promoters table
     toxic_df = _build_triage_df(df, "is_toxic_promoter")
@@ -100,8 +125,10 @@ def render_toxic_promoters(df: pd.DataFrame) -> None:
             use_container_width=True,
         )
     else:
-        st.success(
-            "No toxic promoters detected — all promoters have matching sentiment."
+        empty_state(
+            "✅",
+            "No toxic promoters detected",
+            "All promoters have matching positive sentiment.",
         )
 
     # Glowing Detractors section
@@ -141,4 +168,8 @@ def render_toxic_promoters(df: pd.DataFrame) -> None:
             use_container_width=True,
         )
     else:
-        st.info("No glowing detractors detected.")
+        empty_state(
+            "💡",
+            "No glowing detractors detected",
+            "No low-score respondents with positive sentiment found.",
+        )

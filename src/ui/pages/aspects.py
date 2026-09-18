@@ -9,7 +9,7 @@ from src.analytics.aggregator import (
     aspect_sentiment_distribution,
     aspect_volume_by_segment,
 )
-from src.ui.components import aspect_badge, section_header
+from src.ui.components import aspect_badge, empty_state, section_header
 
 
 def render_aspects(df: pd.DataFrame) -> None:
@@ -21,7 +21,11 @@ def render_aspects(df: pd.DataFrame) -> None:
     section_header("Aspect Analysis", "Sentiment breakdown by product aspect")
 
     if df.empty or "aspects" not in df.columns:
-        st.info("No aspect data available for the selected filters.")
+        empty_state(
+            "🔍",
+            "No aspect data available",
+            "Try expanding your date range or adjusting segment filters.",
+        )
         return
 
     # Stacked bar chart: aspect x sentiment
@@ -89,7 +93,7 @@ def render_aspects(df: pd.DataFrame) -> None:
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No segment data available for heatmap.")
+            empty_state("🗺️", "No segment data for heatmap", "Ensure responses include segment information.")
 
     # Filterable comment list per aspect
     section_header("Comments by Aspect", "Filter to explore individual feedback")
@@ -102,7 +106,7 @@ def render_aspects(df: pd.DataFrame) -> None:
                     all_aspects.add(entry["aspect"])
 
     if not all_aspects:
-        st.info("No aspects found in the data.")
+        empty_state("🏷️", "No aspects found in the data", "Aspects are extracted from comments by the LLM.")
         return
 
     sorted_aspects = sorted(all_aspects)
@@ -147,4 +151,4 @@ def render_aspects(df: pd.DataFrame) -> None:
             hide_index=True,
         )
     else:
-        st.info(f"No comments found for aspect '{selected_aspect}'.")
+        empty_state("💬", f"No comments for '{selected_aspect.replace('_', ' ').title()}'", "Try selecting a different aspect.")

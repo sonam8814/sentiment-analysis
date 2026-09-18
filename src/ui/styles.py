@@ -120,10 +120,78 @@ def inject_css() -> None:
             color: {COLORS["passive"]};
         }}
 
+        /* Header bar */
+        .header-bar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid {COLORS["border"]};
+        }}
+
+        .header-title {{
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: {COLORS["text_primary"]};
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }}
+
+        .header-title .accent {{
+            color: {COLORS["accent"]};
+        }}
+
+        .header-timestamp {{
+            font-size: 0.75rem;
+            color: {COLORS["text_secondary"]};
+        }}
+
+        /* Sparkline inside KPI card */
+        .glass-card svg.sparkline {{
+            display: block;
+            margin-top: 0.5rem;
+        }}
+
+        /* Empty state */
+        .empty-state {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }}
+
+        .empty-state .empty-icon {{
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.6;
+        }}
+
+        .empty-state .empty-message {{
+            color: {COLORS["text_primary"]};
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 0 0.25rem 0;
+        }}
+
+        .empty-state .empty-suggestion {{
+            color: {COLORS["text_secondary"]};
+            font-size: 0.85rem;
+            margin: 0;
+        }}
+
         /* Responsive stacking */
         @media (max-width: 768px) {{
             .glass-card .value {{
                 font-size: 1.5rem;
+            }}
+            .header-bar {{
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
             }}
         }}
 

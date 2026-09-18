@@ -3,7 +3,7 @@
 import pandas as pd
 import streamlit as st
 
-from src.ui.components import section_header
+from src.ui.components import empty_state, section_header
 
 ROWS_PER_PAGE = 50
 
@@ -17,7 +17,11 @@ def render_raw_explorer(df: pd.DataFrame) -> None:
     section_header("Raw Data Explorer", "Browse and export all processed responses")
 
     if df.empty:
-        st.info("No data available for the selected filters.")
+        empty_state(
+            "📭",
+            "No data available",
+            "Try expanding your date range or adjusting segment filters.",
+        )
         return
 
     # Build display DataFrame (only redacted comments, never raw)

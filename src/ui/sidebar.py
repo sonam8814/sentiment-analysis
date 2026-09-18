@@ -65,18 +65,8 @@ def render_sidebar() -> dict:
             unsafe_allow_html=True,
         )
 
-        st.markdown("---")
-
-        # Page navigation
-        page = st.radio(
-            "Navigate",
-            options=["Overview", "Aspects", "Toxic Promoters", "Raw Data"],
-            key="page_nav",
-        )
-
     return {
         "start_date": start_date,
         "end_date": end_date,
         "segments": segments,
-        "page": page,
     }
