@@ -98,7 +98,8 @@ def main() -> None:
         )
 
     # Apply segment filter (post-cache, since it's a lightweight filter)
-    if not df.empty and "segment" in df.columns:
+    # Skip when no segment options exist — avoids filtering out all rows
+    if not df.empty and "segment" in df.columns and filters["segments"]:
         df = df[df["segment"].isin(filters["segments"])]
 
     # Header bar

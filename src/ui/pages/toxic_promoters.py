@@ -24,12 +24,15 @@ def _build_triage_df(df: pd.DataFrame, flag_col: str) -> pd.DataFrame:
     if flagged.empty:
         return pd.DataFrame()
 
+    sentiment_icons = {"positive": "🟢", "neutral": "🟡", "negative": "🔴"}
     display = pd.DataFrame(
         {
             "Date": flagged["response_date"],
             "Score": flagged["nps_score"],
             "Comment": flagged["comment_redacted"],
-            "Overall Sentiment": flagged["overall_sentiment"],
+            "Overall Sentiment": flagged["overall_sentiment"].apply(
+                lambda s: f"{sentiment_icons.get(s, '')} {s}" if pd.notna(s) else s
+            ),
             "Segment": flagged.get("segment", ""),
         }
     )

@@ -5,7 +5,7 @@ import streamlit as st
 
 from src.ui.components import empty_state, section_header
 
-ROWS_PER_PAGE = 50
+ROWS_PER_PAGE = 100
 
 
 def render_raw_explorer(df: pd.DataFrame) -> None:
@@ -73,19 +73,43 @@ def render_raw_explorer(df: pd.DataFrame) -> None:
             )
         ]
 
+    # Sentiment color mapping for display
+    sentiment_icons = {"positive": "🟢", "neutral": "🟡", "negative": "🔴"}
+    category_icons = {"promoter": "🟢", "passive": "🟡", "detractor": "🔴"}
+    if "overall_sentiment" in display_df.columns:
+        display_df["overall_sentiment"] = display_df["overall_sentiment"].apply(
+            lambda s: f"{sentiment_icons.get(s, '')} {s}" if pd.notna(s) else s
+        )
+    if "category" in display_df.columns:
+        display_df["category"] = display_df["category"].apply(
+            lambda c: f"{category_icons.get(c, '')} {c}" if pd.notna(c) else c
+        )
+
     # Stats
     st.markdown(f"**{len(display_df):,}** rows matching filters")
 
-    # Pagination
+    # Pagination with Prev / Next buttons
     total_pages = max(1, (len(display_df) + ROWS_PER_PAGE - 1) // ROWS_PER_PAGE)
-    page = st.number_input(
-        "Page",
-        min_value=1,
-        max_value=total_pages,
-        value=1,
-        step=1,
-        key="raw_page",
-    )
+
+    col_prev, col_page, col_next = st.columns([1, 2, 1])
+    with col_page:
+        page = st.number_input(
+            "Page",
+            min_value=1,
+            max_value=total_pages,
+            value=1,
+            step=1,
+            key="raw_page",
+            label_visibility="collapsed",
+        )
+    with col_prev:
+        if st.button("< Prev", use_container_width=True, disabled=(page <= 1)):
+            st.session_state["raw_page"] = page - 1
+            st.rerun()
+    with col_next:
+        if st.button("Next >", use_container_width=True, disabled=(page >= total_pages)):
+            st.session_state["raw_page"] = page + 1
+            st.rerun()
 
     start_idx = (page - 1) * ROWS_PER_PAGE
     end_idx = start_idx + ROWS_PER_PAGE

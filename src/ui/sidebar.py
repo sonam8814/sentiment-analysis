@@ -1,4 +1,4 @@
-"""Sidebar controls — date range, segment filter, refresh, provider indicator."""
+"""Sidebar controls — date range, segment filter, refresh, provider badge."""
 
 from datetime import date, timedelta
 
@@ -12,54 +12,49 @@ def render_sidebar() -> dict:
     """Render the sidebar and return the current filter state.
 
     Returns:
-        Dict with keys: start_date, end_date, segments, page.
+        Dict with keys: start_date, end_date, segments.
     """
     settings = get_settings()
 
     with st.sidebar:
-        st.markdown("## NPS Analytics")
-        st.markdown("---")
+        st.markdown("## Filters")
 
-        # Date range picker
-        st.markdown("### Date Range")
-        default_end = date.today()
-        default_start = default_end - timedelta(days=30)
+        # Date range
+        with st.expander("Date Range", expanded=True):
+            default_end = date.today()
+            default_start = default_end - timedelta(days=30)
 
-        start_date = st.date_input("Start date", value=default_start, key="start_date")
-        end_date = st.date_input("End date", value=default_end, key="end_date")
+            start_date = st.date_input("Start", value=default_start, key="start_date")
+            end_date = st.date_input("End", value=default_end, key="end_date")
 
-        if start_date > end_date:
-            st.error("Start date must be before end date.")
-            start_date, end_date = end_date, start_date
+            if start_date > end_date:
+                st.error("Start date must be before end date.")
+                start_date, end_date = end_date, start_date
 
-        st.markdown("---")
+        # Segments
+        with st.expander("Segments", expanded=True):
+            segment_options = fetch_distinct_segments()
+            segments = st.multiselect(
+                "Filter by segment",
+                options=segment_options,
+                default=segment_options,
+                key="segments",
+                label_visibility="collapsed",
+            )
 
-        # Segment filter — dynamically loaded from DB
-        st.markdown("### Segments")
-        segment_options = fetch_distinct_segments()
-        segments = st.multiselect(
-            "Filter by segment",
-            options=segment_options,
-            default=segment_options,
-            key="segments",
-        )
+        st.markdown("")
 
-        st.markdown("---")
-
-        # Refresh button
         if st.button("Refresh Data", use_container_width=True, type="primary"):
             st.cache_data.clear()
             st.rerun()
 
-        st.markdown("---")
-
-        # LLM provider indicator
+        # Provider footer badge
         provider = settings.llm_provider_primary.upper()
         st.markdown(
             f"""
-            <div style="text-align: center; padding: 0.5rem;">
-                <span style="color: #9CA3AF; font-size: 0.75rem;">LLM PROVIDER</span><br>
-                <span style="color: #6366F1; font-weight: 600;">{provider}</span>
+            <div class="sidebar-footer-badge">
+                <span class="badge-label">LLM</span>
+                <span class="badge-value">{provider}</span>
             </div>
             """,
             unsafe_allow_html=True,

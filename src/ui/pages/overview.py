@@ -150,6 +150,8 @@ def render_overview(df: pd.DataFrame) -> None:
             sparkline=sparks.get("detractor_pct"),
         )
 
+    CHART_HEIGHT = 350
+
     # Middle row: NPS trend + category donut
     section_header("Trends", "NPS over time and category distribution")
     col_trend, col_donut = st.columns([2, 1])
@@ -171,6 +173,7 @@ def render_overview(df: pd.DataFrame) -> None:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=20, r=20, t=30, b=20),
+                height=CHART_HEIGHT,
                 xaxis_title="",
                 yaxis_title="NPS",
                 yaxis=dict(range=[-100, 100]),
@@ -203,6 +206,7 @@ def render_overview(df: pd.DataFrame) -> None:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=20, r=20, t=30, b=20),
+                height=CHART_HEIGHT,
                 showlegend=True,
                 legend=dict(
                     orientation="h", yanchor="bottom", y=-0.15, x=0.5, xanchor="center"
@@ -211,6 +215,40 @@ def render_overview(df: pd.DataFrame) -> None:
             st.plotly_chart(fig, use_container_width=True)
         else:
             empty_state("🍩", "No category data available")
+
+    # Score distribution histogram
+    section_header("Score Distribution", "Response counts by NPS score (0-10)")
+    if "nps_score" in df.columns:
+        score_counts = df["nps_score"].value_counts().reindex(range(11), fill_value=0)
+        bar_colors = [
+            COLORS["detractor"] if s <= 6
+            else COLORS["passive"] if s <= 8
+            else COLORS["promoter"]
+            for s in range(11)
+        ]
+        fig = go.Figure(
+            data=go.Bar(
+                x=list(range(11)),
+                y=score_counts.values,
+                marker_color=bar_colors,
+                hovertemplate="Score %{x}: %{y} responses<extra></extra>",
+            )
+        )
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=20, r=20, t=30, b=20),
+            height=CHART_HEIGHT,
+            xaxis=dict(
+                title="NPS Score",
+                tickmode="linear",
+                dtick=1,
+            ),
+            yaxis_title="Count",
+            bargap=0.15,
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
     # Bottom row: Top 5 aspects by volume
     section_header("Top Aspects", "Most mentioned aspects with sentiment breakdown")
@@ -244,6 +282,7 @@ def render_overview(df: pd.DataFrame) -> None:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=20, r=20, t=30, b=20),
+                height=CHART_HEIGHT,
                 xaxis_title="",
                 yaxis_title="Count",
                 legend=dict(
@@ -254,4 +293,4 @@ def render_overview(df: pd.DataFrame) -> None:
         else:
             empty_state("🔍", "No aspect data available", "Aspects are extracted from comment text by the LLM.")
     else:
-        st.info("No aspect data available.")
+        empty_state("🔍", "No aspect data available", "Aspects are extracted from comment text by the LLM.")

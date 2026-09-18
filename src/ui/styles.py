@@ -183,6 +183,35 @@ def inject_css() -> None:
             margin: 0;
         }}
 
+        /* Sidebar footer badge */
+        .sidebar-footer-badge {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 2rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            background: {COLORS["bg_card"]};
+            border: 1px solid {COLORS["border"]};
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }}
+
+        .sidebar-footer-badge .badge-label {{
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: {COLORS["text_secondary"]};
+            letter-spacing: 0.05em;
+        }}
+
+        .sidebar-footer-badge .badge-value {{
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: {COLORS["accent"]};
+        }}
+
         /* Responsive stacking */
         @media (max-width: 768px) {{
             .glass-card .value {{

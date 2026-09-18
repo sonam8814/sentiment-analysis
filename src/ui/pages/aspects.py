@@ -28,6 +28,8 @@ def render_aspects(df: pd.DataFrame) -> None:
         )
         return
 
+    CHART_HEIGHT = 350
+
     # Stacked bar chart: aspect x sentiment
     aspect_dist = aspect_sentiment_distribution(df)
     if not aspect_dist.empty:
@@ -51,6 +53,7 @@ def render_aspects(df: pd.DataFrame) -> None:
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             margin=dict(l=20, r=20, t=30, b=20),
+            height=CHART_HEIGHT,
             xaxis_title="",
             yaxis_title="Count",
             legend=dict(
@@ -88,6 +91,7 @@ def render_aspects(df: pd.DataFrame) -> None:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=20, r=20, t=30, b=20),
+                height=CHART_HEIGHT,
                 xaxis_title="Segment",
                 yaxis_title="",
             )
@@ -117,6 +121,7 @@ def render_aspects(df: pd.DataFrame) -> None:
     )
 
     # Filter rows containing the selected aspect
+    sentiment_icons = {"positive": "🟢", "neutral": "🟡", "negative": "🔴"}
     filtered_rows = []
     for _, row in df.iterrows():
         aspects_list = row.get("aspects", [])
@@ -124,11 +129,12 @@ def render_aspects(df: pd.DataFrame) -> None:
             continue
         for entry in aspects_list:
             if isinstance(entry, dict) and entry.get("aspect") == selected_aspect:
+                sent = entry.get("sentiment", "")
                 filtered_rows.append(
                     {
                         "Comment": row.get("comment_redacted", ""),
                         "Score": row.get("nps_score", ""),
-                        "Sentiment": entry.get("sentiment", ""),
+                        "Sentiment": f"{sentiment_icons.get(sent, '')} {sent}",
                         "Confidence": f"{entry.get('confidence', 0):.2f}",
                         "Segment": row.get("segment", ""),
                         "Date": row.get("response_date", ""),
