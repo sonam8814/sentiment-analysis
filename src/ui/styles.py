@@ -249,6 +249,22 @@ def inject_css() -> None:
             overflow: hidden;
         }}
         </style>
+        <script>
+        document.addEventListener('keydown', function(e) {{
+            if (e.shiftKey && e.key === 'R') {{
+                var tag = document.activeElement.tagName.toLowerCase();
+                if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+                var buttons = window.parent.document.querySelectorAll('button[kind="primary"]');
+                for (var i = 0; i < buttons.length; i++) {{
+                    if (buttons[i].innerText.indexOf('Refresh') !== -1) {{
+                        buttons[i].click();
+                        e.preventDefault();
+                        break;
+                    }}
+                }}
+            }}
+        }});
+        </script>
         """,
         unsafe_allow_html=True,
     )

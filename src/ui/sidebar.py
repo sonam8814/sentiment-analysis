@@ -47,6 +47,7 @@ def render_sidebar() -> dict:
         if st.button("Refresh Data", use_container_width=True, type="primary"):
             st.cache_data.clear()
             st.rerun()
+        st.caption("Shortcut: Shift + R")
 
         # Provider footer badge
         provider = settings.llm_provider_primary.upper()
