@@ -82,16 +82,19 @@ def kpi_card(
     )
 
 
-def header_bar() -> None:
-    """Render the branded header bar with app title and refresh timestamp."""
-    now = datetime.now().strftime("%b %d, %Y %I:%M %p")
+def header_bar(fetched_at: str | None = None) -> None:
+    """Render the branded header bar with app title and data fetch timestamp."""
+    if fetched_at:
+        ts = datetime.fromisoformat(fetched_at).strftime("%b %d, %Y %I:%M %p")
+    else:
+        ts = datetime.now().strftime("%b %d, %Y %I:%M %p")
     st.markdown(
         f"""
         <div class="header-bar">
             <div class="header-title">
                 <span class="accent">NPS</span> Sentiment Analytics
             </div>
-            <div class="header-timestamp">Last refreshed &middot; {now}</div>
+            <div class="header-timestamp">Data fetched &middot; {ts}</div>
         </div>
         """,
         unsafe_allow_html=True,

@@ -39,7 +39,7 @@ inject_css()
 def load_and_process_data(
     start_date: str,
     end_date: str,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, str]:
     """Fetch, clean, analyze, and flag NPS data.
 
     Cached at the Streamlit layer with 10-minute TTL.
@@ -50,11 +50,12 @@ def load_and_process_data(
         end_date: ISO date string for range end.
 
     Returns:
-        Fully processed DataFrame.
+        Tuple of (processed DataFrame, ISO timestamp of when data was fetched).
     """
-    from datetime import date
+    from datetime import date, datetime
 
     logger.info(f"Loading data: {start_date} to {end_date}")
+    fetched_at = datetime.now().isoformat()
 
     # Fetch from Supabase
     df = fetch_responses(
@@ -64,7 +65,7 @@ def load_and_process_data(
 
     if df.empty:
         logger.info("No data returned from Supabase")
-        return df
+        return df, fetched_at
 
     # Clean and redact PII
     df = clean_dataframe(df)
@@ -82,7 +83,7 @@ def load_and_process_data(
     df = flag_toxic_promoters(df)
 
     logger.info(f"Pipeline complete: {len(df)} rows processed")
-    return df
+    return df, fetched_at
 
 
 def main() -> None:
@@ -92,7 +93,7 @@ def main() -> None:
 
     # Load data
     with st.spinner("Loading and analyzing data..."):
-        df = load_and_process_data(
+        df, fetched_at = load_and_process_data(
             start_date=filters["start_date"].isoformat(),
             end_date=filters["end_date"].isoformat(),
         )
@@ -102,8 +103,8 @@ def main() -> None:
     if not df.empty and "segment" in df.columns and filters["segments"]:
         df = df[df["segment"].isin(filters["segments"])]
 
-    # Header bar
-    header_bar()
+    # Header bar with actual data fetch timestamp
+    header_bar(fetched_at=fetched_at)
 
     # Tab navigation
     tab_overview, tab_aspects, tab_toxic, tab_raw = st.tabs(
